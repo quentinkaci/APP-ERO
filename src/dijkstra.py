@@ -13,7 +13,7 @@ def build_dist(graph):
 
 
 def mindistance(graph, dist, sptSet):
-    min_index, mini = inf, inf
+    min_index, mini = -1, inf
     for v in range(graph.num_vertices):
         if dist[v] < mini and not sptSet[v]:
             mini = dist[v]
