@@ -11,13 +11,13 @@ def hierholzer_cycle(graph):
     edges = graph.edges.copy()
     while True:
         rest = []
-        for src, dst, _ in edges:
+        for src, dst, dist in edges:
             if cycle[-1] == src:
                 cycle.append(dst)
             elif not graph.directed and cycle[-1] == dst:
                 cycle.append(src)
             else:
-                rest.append((src, dst))
+                rest.append((src, dst, dist))
         if not rest:
             return cycle
         edges = rest
@@ -30,11 +30,7 @@ def hierholzer_cycle(graph):
 
 
 def find_eulerian_cycle(graph):
-    for i in range(2000):
-        path = hierholzer_cycle(graph)
-        if len(path) == graph.num_edges + 1:
-            return path
-    return []
+    return hierholzer_cycle(graph)
 
 
 def make_eulerian_graph(graph):

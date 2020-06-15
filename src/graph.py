@@ -11,9 +11,8 @@ class Graph:
         deg = [0] * self.num_vertices
         for src, dst, _ in self.edges:
             deg[src] += 1
-            if self.directed:
-                deg[dst] += 1
-        return [a for a in range(self.num_vertices) if not deg[a] % 2]
+            deg[dst] += 1
+        return [v for v in range(self.num_vertices) if not deg[v] % 2]
 
     def is_eulerian(self):
         # Forgetting if the graph is not edge connected
