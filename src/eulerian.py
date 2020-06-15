@@ -1,4 +1,5 @@
 import numpy as np
+import itertools
 
 
 def hierholzer_cycle(graph):
@@ -33,6 +34,27 @@ def find_eulerian_cycle(graph):
     return hierholzer_cycle(graph)
 
 
+def double_dead_end_edges(graph):
+    single_vertices = graph.get_single_vertices()
+
+    edges_to_double = []
+    for v in single_vertices:
+        for src, dst, dist in graph.edges:
+            if v in (src, dst):
+                # FIXME maybe a bug here
+                edges_to_double.append((src, dst, dist))
+
+    graph.add_edges(edges_to_double)
+
+
 def make_eulerian_graph(graph):
+
+    double_dead_end_edges(graph)
+
+    # Step 1: All possible pairs of odd nodes
+    # TODO change itertools.combinations to our own function
+    odd_node_pairs = itertools.combinations(graph.get_odd_vertices(), 2)
+
     # FIXME
+
     return graph
