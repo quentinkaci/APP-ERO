@@ -2,6 +2,8 @@ import numpy as np
 import itertools
 from src.dijkstra import dijkstra
 
+inf = np.iinfo(int).max
+
 
 def hierholzer_cycle(graph):
     if graph.num_edges == 0:
@@ -62,6 +64,34 @@ def find_weighted_odd_pairings(graph):
                 res[(dst, src)] = (weight, path[::-1])
 
     return res
+
+
+def find_minimum_path(pair_sets, pair_dict):
+    min_weight = inf
+    min_path = []
+
+    for pair_set in pair_sets:
+        pair_weight = 0
+        for pair in pair_set:
+            pair_weight += pair_dict[pair][0]
+        if pair_weight < min_weight:
+            min_weight = pair_weight
+            path = []
+            for pair in pair_set:
+                path.append(pair_dict[pair][1])
+            min_path = path
+
+    return min_path
+
+
+def add_shortest_path_edges(graph, paths):
+    adjacency_matrix = graph.get_adjacency_matrix()
+    edges_to_add = []
+    for path in paths:
+        for i in range(len(path) - 1):
+            src, dst = path[i], path[i + 1]
+            edges_to_add.append((src, dst, adjacency_matrix[src][dst]))
+    graph.add_edges(edges_to_add)
 
 
 def make_eulerian_graph(graph):
