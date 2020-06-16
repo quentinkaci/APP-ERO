@@ -1,11 +1,4 @@
-def adjacency_list(graph):
-    succ = [[] for i in range(graph.num_vertices)]
-
-    for (src, dst, dist) in graph.edges:
-        succ[src].append((dst, dist))
-        if not graph.directed:
-            succ[dst].append((src, dist))
-    return succ
+import numpy as np
 
 
 class Graph:
@@ -16,7 +9,6 @@ class Graph:
         self.num_vertices = num_vertices
         self.num_edges = len(edges)
         self.directed = directed
-        self.adjacency_list = adjacency_list(self)
 
     def get_degrees(self):
         deg = [0] * self.num_vertices
@@ -39,3 +31,11 @@ class Graph:
 
     def add_edges(self, edges_to_add):
         self.edges.extend(edges_to_add)
+
+    def get_adjacency_matrix(self):
+        matrix = np.full((self.num_vertices, self.num_vertices), 0)
+        for src, dst, dist in self.edges:
+            matrix[src][dst] = dist
+            if not self.directed:
+                matrix[dst][src] = dist
+        return matrix
