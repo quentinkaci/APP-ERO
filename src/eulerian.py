@@ -41,10 +41,9 @@ def double_dead_end_edges(graph):
     for v in single_vertices:
         for src, dst, dist in graph.edges:
             if v in (src, dst):
-                # FIXME maybe a bug here
                 edges_to_double.append((src, dst, dist))
 
-    graph.add_edges(edges_to_double)
+    graph.add_edges(list(set(edges_to_double)))
 
 
 def make_eulerian_graph(graph):
