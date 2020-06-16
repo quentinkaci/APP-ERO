@@ -78,19 +78,19 @@ def all_possible_pairs(odd_nodes):
             yield [pair]
 
 
-def find_minimum_path(pair_sets, pair_dict):
+def find_minimum_path(odd_node_pairs, weighted_pairings):
     min_weight = inf
     min_path = []
 
-    for pair_set in pair_sets:
+    for pair_set in odd_node_pairs:
         pair_weight = 0
         for pair in pair_set:
-            pair_weight += pair_dict[pair][0]
+            pair_weight += weighted_pairings[pair][0]
         if pair_weight < min_weight:
             min_weight = pair_weight
             path = []
             for pair in pair_set:
-                path.append(pair_dict[pair][1])
+                path.append(weighted_pairings[pair][1])
             min_path = path
 
     return min_path
@@ -111,6 +111,9 @@ def make_eulerian_graph(graph):
 
     weighted_pairings = find_weighted_odd_pairings(graph)
 
-    # FIXME
+    odd_node_pairs = all_possible_pairs(graph.get_odd_vertices())
+
+    min_path = find_minimum_path(odd_node_pairs, weighted_pairings)
+    add_shortest_path_edges(graph, min_path)
 
     return graph
