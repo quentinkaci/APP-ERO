@@ -64,6 +64,18 @@ def find_weighted_odd_pairings(graph):
     return res
 
 
+# TODO change this function by removing yield
+def all_possible_pairs(odd_nodes):
+    for node in odd_nodes[1:]:
+        pair = odd_nodes[0], node
+        rest = [n for n in odd_nodes if n not in pair]
+        if rest:
+            for tail in all_possible_pairs(rest):
+                yield [pair] + tail
+        else:
+            yield [pair]
+
+
 def make_eulerian_graph(graph):
     double_dead_end_edges(graph)
 
