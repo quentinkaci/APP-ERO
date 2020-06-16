@@ -40,4 +40,5 @@ def dijkstra(graph, src, dst):
             if matrix[u][v] > 0 and not shortest_set[v] and dist[v] > weight:
                 dist[v] = weight
                 parent[v] = u
+
     return dist[dst], path(parent, src, dst)

@@ -19,7 +19,7 @@ class Graph:
 
     def get_odd_vertices(self):
         deg = self.get_degrees()
-        return [v for v in range(self.num_vertices) if not deg[v] % 2]
+        return [v for v in range(self.num_vertices) if deg[v] % 2 == 1]
 
     def get_single_vertices(self):
         deg = self.get_degrees()

@@ -1,5 +1,6 @@
 import numpy as np
 import itertools
+from src.dijkstra import dijkstra
 
 
 def hierholzer_cycle(graph):
@@ -46,13 +47,27 @@ def double_dead_end_edges(graph):
     graph.add_edges(list(set(edges_to_double)))
 
 
-def make_eulerian_graph(graph):
+def find_weighted_odd_pairings(graph):
+    # TODO change itertools.combinations to our own function
+    odd_node_pairs = list(itertools.combinations(graph.get_odd_vertices(), 2)) if not graph.directed \
+        else list(itertools.permutations(graph.get_odd_vertices(), 2))
+    res = {}
 
+    for src, dst in odd_node_pairs:
+        if not (src, dst) in res:
+            weight, path = dijkstra(graph, src, dst)
+
+            res[(src, dst)] = (weight, path)
+            if not graph.directed:  # FIXME
+                res[(dst, src)] = (weight, path[::-1])
+
+    return res
+
+
+def make_eulerian_graph(graph):
     double_dead_end_edges(graph)
 
-    # Step 1: All possible pairs of odd nodes
-    # TODO change itertools.combinations to our own function
-    odd_node_pairs = itertools.combinations(graph.get_odd_vertices(), 2)
+    weighted_pairings = find_weighted_odd_pairings(graph)
 
     # FIXME
 
