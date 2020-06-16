@@ -4,12 +4,12 @@ inf = np.iinfo(int).max
 
 
 def build_dist(graph):
-    dist = [[0 for _ in range(graph.num_vertices)] for i in range(graph.num_vertices)]
+    dist_list = [[0 for _ in range(graph.num_vertices)] for i in range(graph.num_vertices)]
     for (src, dst, dist) in graph.edges:
-        dist[src][dst] = dist
+        dist_list[src][dst] = dist
         if not graph.directed:
-            dist[dst][src] = dist
-    return dist
+            dist_list[dst][src] = dist
+    return dist_list
 
 
 def mindistance(graph, dist, sptSet):
@@ -19,6 +19,17 @@ def mindistance(graph, dist, sptSet):
             mini = dist[v]
             min_index = v
     return min_index
+
+
+def path(parent, src, dst):
+    if parent is None or src is None or dst is None:
+        return []
+
+    res = [dst]
+    while dst != src:
+        dst = parent[dst]
+        res.insert(0, dst)
+    return res
 
 
 def dijkstra(graph, src, dst):
@@ -37,15 +48,4 @@ def dijkstra(graph, src, dst):
             if dist_list[u][v] > 0 and not shortest_set[v] and dist[v] > weight:
                 dist[v] = weight
                 parent[v] = u
-    return dist[dst], parent
-
-
-def path(parent, src, dst):
-    if parent is None or src is None or dst is None:
-        return []
-
-    res = [dst]
-    while dst != src:
-        dst = parent[dst]
-        res.insert(0, dst)
-    return res
+    return dist[dst], path(parent, src, dst)
