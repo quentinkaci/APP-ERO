@@ -111,7 +111,7 @@ def make_eulerian_graph(graph):
 
     weighted_pairings = find_weighted_odd_pairings(graph)
 
-    odd_node_pairs = all_possible_pairs(graph.get_odd_vertices())
+    odd_node_pairs = [x for x in all_possible_pairs(graph.get_odd_vertices())]
 
     min_path = find_minimum_path(odd_node_pairs, weighted_pairings)
     add_shortest_path_edges(graph, min_path)
