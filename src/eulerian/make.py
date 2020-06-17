@@ -5,38 +5,6 @@ from src.dijkstra import dijkstra
 inf = np.iinfo(int).max
 
 
-def hierholzer_cycle(graph):
-    if graph.num_edges == 0:
-        return []
-
-    start = np.random.choice(np.arange(graph.num_vertices))
-    cycle = [start]  # start somewhere randomly
-
-    edges = graph.edges.copy()
-    while True:
-        rest = []
-        for src, dst, dist in edges:
-            if cycle[-1] == src:
-                cycle.append(dst)
-            elif not graph.directed and cycle[-1] == dst:
-                cycle.append(src)
-            else:
-                rest.append((src, dst, dist))
-        if not rest:
-            return cycle
-        edges = rest
-        if cycle[0] == cycle[-1]:
-            for src, dst, _ in edges:
-                if src in cycle:
-                    idx = cycle.index(src)
-                    cycle = cycle[idx:-1] + cycle[0:idx + 1]
-                    break
-
-
-def find_eulerian_cycle(graph):
-    return hierholzer_cycle(graph)
-
-
 def double_dead_end_edges(graph):
     single_vertices = graph.get_single_vertices()
 
@@ -50,7 +18,7 @@ def double_dead_end_edges(graph):
 
 
 def find_weighted_odd_pairings(graph):
-    # TODO change itertools.combinations to our own function
+    # TODO change itertools.combinations and itertools.permutations to our own function
     odd_node_pairs = list(itertools.combinations(graph.get_odd_vertices(), 2)) if not graph.directed \
         else list(itertools.permutations(graph.get_odd_vertices(), 2))
     res = {}
@@ -60,7 +28,7 @@ def find_weighted_odd_pairings(graph):
             weight, path = dijkstra(graph, src, dst)
 
             res[(src, dst)] = (weight, path)
-            if not graph.directed:  # FIXME
+            if not graph.directed:  # FIXME maybe a bug
                 res[(dst, src)] = (weight, path[::-1])
 
     return res
@@ -82,14 +50,14 @@ def find_minimum_path(odd_node_pairs, weighted_pairings):
     min_weight = inf
     min_path = []
 
-    for pair_set in odd_node_pairs:
+    for odd_node_pair in odd_node_pairs:
         pair_weight = 0
-        for pair in pair_set:
+        for pair in odd_node_pair:
             pair_weight += weighted_pairings[pair][0]
         if pair_weight < min_weight:
             min_weight = pair_weight
             path = []
-            for pair in pair_set:
+            for pair in odd_node_pair:
                 path.append(weighted_pairings[pair][1])
             min_path = path
 

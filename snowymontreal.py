@@ -1,5 +1,6 @@
 from src.graph import Graph
-from src.eulerian import find_eulerian_cycle, make_eulerian_graph
+from src.eulerian.make import make_eulerian_graph
+from src.eulerian.cycle import find_eulerian_cycle
 
 
 def solve(is_oriented, num_vertices, edge_list):
