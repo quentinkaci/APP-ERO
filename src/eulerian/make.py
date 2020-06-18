@@ -1,6 +1,6 @@
 import numpy as np
 import itertools
-from src.dijkstra import dijkstra
+from src.floyd_warshall import floyd_warshall, get_path
 
 inf = np.iinfo(int).max
 
@@ -17,15 +17,17 @@ def double_dead_end_edges(graph):
     graph.add_edges(list(set(edges_to_double)))
 
 
-def find_weighted_odd_pairings(graph, odd_vertices):
+def find_weighted_unbalanced_pairings(graph, unbalanced_vertices):
     # TODO change itertools.combinations and itertools.permutations to our own function
-    odd_node_pairs = list(itertools.combinations(odd_vertices, 2)) if not graph.directed \
-        else list(itertools.permutations(odd_vertices, 2))
+    unbalanced_vertices_pairs = list(itertools.combinations(unbalanced_vertices, 2)) if not graph.directed \
+        else list(itertools.permutations(unbalanced_vertices, 2))
 
     res = {}
-    for src, dst in odd_node_pairs:
+    paths_costs, parents = floyd_warshall(graph)
+
+    for src, dst in unbalanced_vertices_pairs:
         if not (src, dst) in res:
-            weight, path = dijkstra(graph, src, dst)
+            weight, path = paths_costs[src][dst], get_path(parents, src, dst)
             res[(src, dst)] = (weight, path)
             if not graph.directed:
                 res[(dst, src)] = (weight, path[::-1])
@@ -34,22 +36,22 @@ def find_weighted_odd_pairings(graph, odd_vertices):
 
 
 # TODO change this function by removing yield
-def all_possible_pairs_undirected(odd_vertices):
-    for node in odd_vertices[1:]:
-        pair = odd_vertices[0], node
-        rest = [n for n in odd_vertices if n not in pair]
+def all_matching_undirected(unbalanced_vertices):
+    for node in unbalanced_vertices[1:]:
+        pair = unbalanced_vertices[0], node
+        rest = [n for n in unbalanced_vertices if n not in pair]
         if rest:
-            for tail in all_possible_pairs_undirected(rest):
+            for tail in all_matching_undirected(rest):
                 yield [pair] + tail
         else:
             yield [pair]
 
 
-def all_possible_pairs_directed(graph, odd_vertices):
+def all_matching_directed(graph, unbalanced_vertices):
     in_deg, out_deg = graph.get_in_degrees(), graph.get_out_degrees()
     negatives, positives = [], []
 
-    for v in odd_vertices:
+    for v in unbalanced_vertices:
         delta = out_deg[v] - in_deg[v]
         diff = abs(delta)
         for _ in range(diff):
@@ -71,51 +73,56 @@ def all_possible_pairs_directed(graph, odd_vertices):
             used[pair[0]] = True
             used[pair[1]] = True
         to_add = True
-        for v in odd_vertices:
+        for v in unbalanced_vertices:
             to_add &= used[v]
         if to_add:
             res.append([x for x in combination])
     return res
 
 
-def find_minimum_pairing(odd_node_pairs, weighted_pairings):
+def all_matching(graph, unbalanced_vertices):
+    return all_matching_directed(graph, unbalanced_vertices) if graph.directed \
+        else [x for x in all_matching_undirected(unbalanced_vertices)]
+
+
+def find_minimum_path(unbalanced_pairs, weighted_pairings):
     min_weight = inf
     min_path = []
 
-    for odd_node_pair in odd_node_pairs:
+    for unbalanced_pair in unbalanced_pairs:
         pair_weight = 0
-        for pair in odd_node_pair:
+        for pair in unbalanced_pair:
             pair_weight += weighted_pairings[pair][0]
         if pair_weight < min_weight:
             min_weight = pair_weight
             path = []
-            for pair in odd_node_pair:
+            for pair in unbalanced_pair:
                 path.append(weighted_pairings[pair][1])
             min_path = path
 
     return min_path
 
 
-def add_shortest_path_edges(graph, paths):
+def add_min_path_edges(graph, paths):
     adjacency_matrix = graph.get_adjacency_matrix()
     edges_to_add = []
+
     for path in paths:
         for i in range(len(path) - 1):
             src, dst = path[i], path[i + 1]
             edges_to_add.append((src, dst, adjacency_matrix[src][dst]))
+
     graph.add_edges(edges_to_add)
 
 
 def make_eulerian_graph(graph):
     double_dead_end_edges(graph)
-    odd_vertices = graph.get_unbalanced_vertices() if graph.directed else graph.get_odd_vertices()
 
-    weighted_pairings = find_weighted_odd_pairings(graph, odd_vertices)
+    unbalanced_vertices = graph.get_unbalanced_vertices()
+    weighted_pairings = find_weighted_unbalanced_pairings(graph, unbalanced_vertices)
+    unbalanced_node_combinations = all_matching(graph, unbalanced_vertices)
 
-    odd_node_pairs = all_possible_pairs_directed(graph, odd_vertices) if graph.directed \
-        else [x for x in all_possible_pairs_undirected(odd_vertices)]
-
-    min_path = find_minimum_pairing(odd_node_pairs, weighted_pairings)
-    add_shortest_path_edges(graph, min_path)
+    min_path = find_minimum_path(unbalanced_node_combinations, weighted_pairings)
+    add_min_path_edges(graph, min_path)
 
     return graph

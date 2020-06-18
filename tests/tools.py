@@ -36,12 +36,14 @@ def is_eulerian_cycle(edges, cycle):
 
 def total_cost(edges, cycle):
     res = 0
+
     for node in range(len(cycle) - 1):
         src, dst = cycle[node], cycle[node + 1]
         for s, d, dist in edges:
             if s == src and d == dst or s == dst and d == src:
                 res += dist
                 break
+
     return res
 
 

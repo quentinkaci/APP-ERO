@@ -38,13 +38,17 @@ class Graph:
         return [v for v in range(self.num_vertices) if deg[v] % 2 == 1]
 
     def get_unbalanced_vertices(self):
-        in_deg = self.get_in_degrees()
-        out_deg = self.get_out_degrees()
         res = []
 
-        for vertex in range(self.num_vertices):
-            if out_deg[vertex] - in_deg[vertex] != 0:
-                res.append(vertex)
+        if self.directed:
+            in_deg = self.get_in_degrees()
+            out_deg = self.get_out_degrees()
+
+            for vertex in range(self.num_vertices):
+                if out_deg[vertex] - in_deg[vertex] != 0:
+                    res.append(vertex)
+        else:
+            res = self.get_odd_vertices()
 
         return res
 
@@ -73,11 +77,8 @@ class Graph:
 
     def get_adjacency_list(self):
         res = [[] for _ in range(self.num_vertices)]
-
-        # Without weights
         for src, dst, _ in self.edges:
             res[src].append(dst)
             if not self.directed:
                 res[dst].append(src)
-
         return res
