@@ -46,29 +46,23 @@ def all_possible_pairs_undirected(odd_vertices):
 
 
 def all_possible_pairs_directed(graph, odd_vertices):
-    in_deg = graph.get_in_degrees()
-    out_deg = graph.get_out_degrees()
-    negatives = []
-    positives = []
+    in_deg, out_deg = graph.get_in_degrees(), graph.get_out_degrees()
+    negatives, positives = [], []
 
     for v in odd_vertices:
         delta = out_deg[v] - in_deg[v]
-        for _ in range(abs(delta)):
-            if delta > 0:
-                positives.append(v)
-            else:
-                negatives.append(v)
+        diff = abs(delta)
+        for _ in range(diff):
+            positives.append(v) if delta > 0 else negatives.append(v)
 
-    combinations = np.array(np.meshgrid(negatives, positives)).T.reshape(-1, 2)
-    separate_lists = []
-    i = 0
-    while i < len(combinations):
-        new_separation = []
-        while new_separation == [] or i % len(positives) != 0:
-            new_separation.append((combinations[i][0], combinations[i][1]))
-            i += 1
-        separate_lists.append(new_separation)
-    combinations = itertools.product(*separate_lists)
+    combinations = np.array(np.meshgrid(negatives, positives)).T.reshape(len(positives), len(positives), 2)
+    combinations_tuple = []
+    for combination in combinations:
+        combination_tuple = []
+        for pair in combination:
+            combination_tuple.append((pair[0], pair[1]))
+        combinations_tuple.append(combination_tuple)
+    combinations = itertools.product(*combinations_tuple)
 
     res = []
     for combination in combinations:
