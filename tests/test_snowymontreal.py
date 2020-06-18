@@ -15,6 +15,11 @@ def test_solve():
     cycle = snowymontreal.solve(False, 27, edges)
     assert is_solved(edges, cycle)
 
+    edges = [
+        (0, 1, 10), (0, 2, 20), (4, 0, 12), (1, 4, 10), (1, 3, 50), (2, 3, 20), (2, 4, 33), (5, 2, 22),
+        (3, 4, 5), (3, 5, 12), (4, 5, 1)
+    ]
+
     # Directed
-    cycle = snowymontreal.solve(True, 27, edges)
+    cycle = snowymontreal.solve(True, 6, edges)
     assert is_solved(edges, cycle)

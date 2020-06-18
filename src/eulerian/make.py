@@ -17,36 +17,74 @@ def double_dead_end_edges(graph):
     graph.add_edges(list(set(edges_to_double)))
 
 
-def find_weighted_odd_pairings(graph):
+def find_weighted_odd_pairings(graph, odd_vertices):
     # TODO change itertools.combinations and itertools.permutations to our own function
-    odd_node_pairs = list(itertools.combinations(graph.get_odd_vertices(), 2)) if not graph.directed \
-        else list(itertools.permutations(graph.get_odd_vertices(), 2))
-    res = {}
+    odd_node_pairs = list(itertools.combinations(odd_vertices, 2)) if not graph.directed \
+        else list(itertools.permutations(odd_vertices, 2))
 
+    res = {}
     for src, dst in odd_node_pairs:
         if not (src, dst) in res:
             weight, path = dijkstra(graph, src, dst)
-
             res[(src, dst)] = (weight, path)
-            if not graph.directed:  # FIXME maybe a bug
+            if not graph.directed:
                 res[(dst, src)] = (weight, path[::-1])
 
     return res
 
 
 # TODO change this function by removing yield
-def all_possible_pairs(odd_nodes):
-    for node in odd_nodes[1:]:
-        pair = odd_nodes[0], node
-        rest = [n for n in odd_nodes if n not in pair]
+def all_possible_pairs_undirected(odd_vertices):
+    for node in odd_vertices[1:]:
+        pair = odd_vertices[0], node
+        rest = [n for n in odd_vertices if n not in pair]
         if rest:
-            for tail in all_possible_pairs(rest):
+            for tail in all_possible_pairs_undirected(rest):
                 yield [pair] + tail
         else:
             yield [pair]
 
 
-def find_minimum_path(odd_node_pairs, weighted_pairings):
+def all_possible_pairs_directed(graph, odd_vertices):
+    in_deg = graph.get_in_degrees()
+    out_deg = graph.get_out_degrees()
+    negatives = []
+    positives = []
+
+    for v in odd_vertices:
+        delta = out_deg[v] - in_deg[v]
+        for _ in range(abs(delta)):
+            if delta > 0:
+                positives.append(v)
+            else:
+                negatives.append(v)
+
+    combinations = np.array(np.meshgrid(negatives, positives)).T.reshape(-1, 2)
+    separate_lists = []
+    i = 0
+    while i < len(combinations):
+        new_separation = []
+        while new_separation == [] or i % len(positives) != 0:
+            new_separation.append((combinations[i][0], combinations[i][1]))
+            i += 1
+        separate_lists.append(new_separation)
+    combinations = itertools.product(*separate_lists)
+
+    res = []
+    for combination in combinations:
+        used = np.full(graph.num_vertices, False)
+        for pair in combination:
+            used[pair[0]] = True
+            used[pair[1]] = True
+        to_add = True
+        for v in odd_vertices:
+            to_add &= used[v]
+        if to_add:
+            res.append([x for x in combination])
+    return res
+
+
+def find_minimum_pairing(odd_node_pairs, weighted_pairings):
     min_weight = inf
     min_path = []
 
@@ -76,12 +114,15 @@ def add_shortest_path_edges(graph, paths):
 
 def make_eulerian_graph(graph):
     double_dead_end_edges(graph)
+    odd_vertices = graph.get_unbalanced_vertices() if graph.directed else graph.get_odd_vertices()
 
-    weighted_pairings = find_weighted_odd_pairings(graph)
+    weighted_pairings = find_weighted_odd_pairings(graph, odd_vertices)
 
-    odd_node_pairs = [x for x in all_possible_pairs(graph.get_odd_vertices())]
+    odd_node_pairs = all_possible_pairs_directed(graph, odd_vertices) if graph.directed \
+        else [x for x in all_possible_pairs_undirected(odd_vertices)]
 
-    min_path = find_minimum_path(odd_node_pairs, weighted_pairings)
+    min_path = find_minimum_pairing(odd_node_pairs, weighted_pairings)
+    print(min_path)
     add_shortest_path_edges(graph, min_path)
 
     return graph

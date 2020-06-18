@@ -37,6 +37,17 @@ class Graph:
         deg = self.get_degrees()
         return [v for v in range(self.num_vertices) if deg[v] % 2 == 1]
 
+    def get_unbalanced_vertices(self):
+        in_deg = self.get_in_degrees()
+        out_deg = self.get_out_degrees()
+        res = []
+
+        for vertex in range(self.num_vertices):
+            if out_deg[vertex] - in_deg[vertex] != 0:
+                res.append(vertex)
+
+        return res
+
     def get_single_vertices(self):
         deg = self.get_degrees()
         return [v for v in range(self.num_vertices) if deg[v] == 1]
