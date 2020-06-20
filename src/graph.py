@@ -66,6 +66,11 @@ class Graph:
 
     def add_edges(self, edges_to_add):
         self.edges.extend(edges_to_add)
+        self.num_edges = len(self.edges)
+
+    def add_edge(self, edge):
+        self.edges.append(edge)
+        self.num_edges += 1
 
     def get_adjacency_matrix(self):
         matrix = np.full((self.num_vertices, self.num_vertices), 0)
