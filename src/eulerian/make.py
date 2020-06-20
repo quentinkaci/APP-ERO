@@ -5,6 +5,7 @@ from src.hungarian import max_weight_matching
 from src.graph import Graph
 
 inf = np.iinfo(int).max
+min_inf = np.iinfo(int).min
 
 
 def double_dead_end_edges(graph):
@@ -68,7 +69,7 @@ def find_minimum_path_directed(graph, unbalanced_vertices, weighted_pairings):
         for _ in range(diff):
             positives.append(v) if delta > 0 else negatives.append(v)
 
-    bipartite_matrix = np.full((len(positives), len(negatives)), inf)
+    bipartite_matrix = np.full((len(positives), len(negatives)), min_inf)
     for src in range(len(negatives)):
         for dst in range(len(positives)):
             bipartite_matrix[src][dst] = -weighted_pairings[(negatives[src], positives[dst])][0]
@@ -131,6 +132,7 @@ def make_eulerian_graph(graph):
     """if not graph.directed:
         min_spanning_tree = kruskal_min_spanning_tree(graph)
         graph = Graph(graph.num_vertices, min_spanning_tree)"""
+
     double_dead_end_edges(graph)
 
     unbalanced_vertices = graph.get_unbalanced_vertices()
