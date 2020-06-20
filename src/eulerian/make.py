@@ -1,8 +1,6 @@
 import numpy as np
-import itertools
 from src.floyd_warshall import floyd_warshall, get_path
 from src.hungarian import max_weight_matching
-from src.graph import Graph
 
 inf = np.iinfo(int).max
 min_inf = np.iinfo(int).min
@@ -20,23 +18,6 @@ def double_dead_end_edges(graph):
     graph.add_edges(list(set(edges_to_double)))
 
 
-def find_weighted_unbalanced_pairings(graph, unbalanced_vertices):
-    unbalanced_vertices_pairs = list(itertools.combinations(unbalanced_vertices, 2)) if not graph.directed \
-        else list(itertools.permutations(unbalanced_vertices, 2))
-
-    res = {}
-    paths_costs, parents = floyd_warshall(graph)
-
-    for src, dst in unbalanced_vertices_pairs:
-        if not (src, dst) in res:
-            weight, path = paths_costs[src][dst], get_path(parents, src, dst)
-            res[(src, dst)] = (weight, path)
-            if not graph.directed:
-                res[(dst, src)] = (weight, path[::-1])
-
-    return res
-
-
 def all_matching_undirected(unbalanced_vertices):
     for node in unbalanced_vertices[1:]:
         pair = unbalanced_vertices[0], node
@@ -52,14 +33,11 @@ def all_matching(unbalanced_vertices):
     return [x for x in all_matching_undirected(unbalanced_vertices)]
 
 
-def find_path(combinations, weighted_pairings):
-    path = []
-    for pair in combinations:
-        path.append(weighted_pairings[pair][1])
-    return path
+def find_path(combinations, parents):
+    return [get_path(parents, src, dst) for src, dst in combinations]
 
 
-def find_minimum_path_directed(graph, unbalanced_vertices, weighted_pairings):
+def find_minimum_path_directed(graph, unbalanced_vertices, paths_costs, parents):
     in_deg, out_deg = graph.get_in_degrees(), graph.get_out_degrees()
     negatives, positives = [], []
 
@@ -72,18 +50,15 @@ def find_minimum_path_directed(graph, unbalanced_vertices, weighted_pairings):
     bipartite_matrix = np.full((len(positives), len(negatives)), min_inf)
     for src in range(len(negatives)):
         for dst in range(len(positives)):
-            bipartite_matrix[src][dst] = -weighted_pairings[(negatives[src], positives[dst])][0]
+            bipartite_matrix[src][dst] = -paths_costs[negatives[src]][positives[dst]]
 
     min_matching = max_weight_matching(bipartite_matrix)
-    print(min_matching)
-    unbalanced_node_combinations = []
-    for src, dst in min_matching.items():
-        unbalanced_node_combinations.append((negatives[src], positives[dst]))
+    unbalanced_node_combinations = [(negatives[src], positives[dst]) for src, dst in min_matching.items()]
 
-    return find_path(unbalanced_node_combinations, weighted_pairings)
+    return find_path(unbalanced_node_combinations, parents)
 
 
-def find_minimum_path_undirected(unbalanced_vertices, weighted_pairings):
+def find_minimum_path_undirected(unbalanced_vertices, paths_costs, parents):
     unbalanced_pairs = all_matching(unbalanced_vertices)
 
     min_weight = inf
@@ -91,13 +66,21 @@ def find_minimum_path_undirected(unbalanced_vertices, weighted_pairings):
 
     for unbalanced_pair in unbalanced_pairs:
         pair_weight = 0
-        for pair in unbalanced_pair:
-            pair_weight += weighted_pairings[pair][0]
+        for src, dst in unbalanced_pair:
+            pair_weight += paths_costs[src][dst]
         if pair_weight < min_weight:
             min_weight = pair_weight
-            min_path = find_path(unbalanced_pair, weighted_pairings)
+            min_path = find_path(unbalanced_pair, parents)
 
     return min_path
+
+
+def find_minimum_path(graph):
+    unbalanced_vertices = graph.get_unbalanced_vertices()
+    paths_costs, parents = floyd_warshall(graph)
+
+    return find_minimum_path_directed(graph, unbalanced_vertices, paths_costs, parents) if graph.directed \
+        else find_minimum_path_undirected(unbalanced_vertices, paths_costs, parents)
 
 
 def add_min_path_edges(graph, paths):
@@ -110,8 +93,10 @@ def add_min_path_edges(graph, paths):
             edges_to_add.append((src, dst, adjacency_matrix[src][dst]))
 
     graph.add_edges(edges_to_add)
+    return graph
 
 
+"""
 def connected_graph_undirected(edges):
     conversion = {}
     for edge, dist in edges.items():
@@ -126,20 +111,11 @@ def connected_graph_undirected(edges):
         graph.add_edge([conversion[edge[0]], conversion[edge[1]], dist[0]])
 
     return graph, {value: key for (key, value) in conversion.items()}
+"""
 
 
 def make_eulerian_graph(graph):
-    """if not graph.directed:
-        min_spanning_tree = kruskal_min_spanning_tree(graph)
-        graph = Graph(graph.num_vertices, min_spanning_tree)"""
+    if not graph.directed:
+        double_dead_end_edges(graph)
 
-    double_dead_end_edges(graph)
-
-    unbalanced_vertices = graph.get_unbalanced_vertices()
-    weighted_pairings = find_weighted_unbalanced_pairings(graph, unbalanced_vertices)
-
-    min_path = find_minimum_path_directed(graph, unbalanced_vertices, weighted_pairings) if graph.directed \
-        else find_minimum_path_undirected(unbalanced_vertices, weighted_pairings)
-    add_min_path_edges(graph, min_path)
-
-    return graph
+    return add_min_path_edges(graph, find_minimum_path(graph))
