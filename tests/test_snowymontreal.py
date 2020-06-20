@@ -41,6 +41,3 @@ def test_solve():
     # Directed
     cycle = snowymontreal.solve(True, 10, edges)
     assert is_solved(edges, cycle)
-
-
-test_solve()

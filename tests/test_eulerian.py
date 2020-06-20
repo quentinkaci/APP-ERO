@@ -42,6 +42,3 @@ def test_make_eulerian_graph():
     graph = make_eulerian_graph(graph)
 
     assert graph.is_eulerian()
-
-
-test_make_eulerian_graph()
