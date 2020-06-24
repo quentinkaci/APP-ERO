@@ -23,25 +23,31 @@ def solve_city_graph(graph):
             conversions[dst] = len(conversions)
         converted_edges_list.append((conversions[src], conversions[dst], edge_length))
 
+    invert_conversions = {value: key for (key, value) in conversions.items()}
+
     print("converted:", converted_edges_list)
-    print("number of nodes:", G.number_of_nodes())
-    path = solve(False, G.number_of_nodes(), converted_edges_list)
+    print("number of nodes:", len(conversions))
+    path = solve(False, len(conversions), converted_edges_list)
+    path = [invert_conversions[v] for v in path]
+    path = [53064679, 53064680]
 
-    reconverted_path = []
-    keys = list(conversions.keys())
-    vals = list(conversions.values())
-    for v in path:
-        reconverted_path.append(keys[vals.index(v)])
+    for i in range(len(path) - 1):
+        found = False
+        for src, dst, _ in graph.edges:
+            if path[i] == src and path[i+1] == dst or path[i] == dst and path[i+1] == src:
+                found = True
+                break
 
-    return reconverted_path
+        if not found:
+            print(path[i], path[i+1])
+
+    return path
 
 
 # crashes if the route isn't legal
 def show_city_graph_with_route(graph, route):
+    graph.to_undirected()
     ox.plot_graph_route(graph, route, route_linewidth=6, node_size=0, bgcolor='k')
-
-
-
 
 
 # example:
