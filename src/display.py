@@ -1,7 +1,7 @@
 import osmnx as ox
 from snowymontreal import solve
 
-# set log_console to true if the map doesn't download
+# Set log_console to true if the map doesn't download
 ox.config(use_cache=True, log_console=False)
 
 
@@ -29,32 +29,21 @@ def solve_city_graph(graph):
     print("number of nodes:", len(conversions))
     path = solve(False, len(conversions), converted_edges_list)
     path = [invert_conversions[v] for v in path]
-    path = [53064679, 53064680]
-
-    for i in range(len(path) - 1):
-        found = False
-        for src, dst, _ in graph.edges:
-            if path[i] == src and path[i+1] == dst or path[i] == dst and path[i+1] == src:
-                found = True
-                break
-
-        if not found:
-            print(path[i], path[i+1])
 
     return path
 
 
-# crashes if the route isn't legal
+# Crashes if the route isn't legal
 def show_city_graph_with_route(graph, route):
-    graph.to_undirected()
     ox.plot_graph_route(graph, route, route_linewidth=6, node_size=0, bgcolor='k')
 
 
-# example:
+# Example:
 
 # G = download_city_graph('Piedmont, California, USA')
 point = 37.858495, -122.267468
 G = ox.graph_from_point(point, network_type='drive', dist=200)
+G = G.to_undirected()
 
 route = solve_city_graph(G)
 print("best path:", route)
