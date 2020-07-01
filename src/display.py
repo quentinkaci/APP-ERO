@@ -1,5 +1,5 @@
 import osmnx as ox
-from snowymontreal import solve
+from snowymontreal import optimized_solve
 
 # Set log_console to true if the map doesn't download
 ox.config(use_cache=True, log_console=False)
@@ -27,7 +27,7 @@ def solve_city_graph(graph):
 
     print("converted:", converted_edges_list)
     print("number of nodes:", len(conversions))
-    path = solve(False, len(conversions), converted_edges_list)
+    path = optimized_solve(False, len(conversions), converted_edges_list)
     path = [invert_conversions[v] for v in path]
 
     return path

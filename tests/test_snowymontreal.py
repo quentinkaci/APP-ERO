@@ -38,7 +38,7 @@ def test_solve():
     ]
 
     # Not directed
-    cycle = snowymontreal.solve(False, 103, edges)
+    cycle = snowymontreal.optimized_solve(False, 103, edges)
     assert is_solved(edges, cycle)
 
     edges = [
