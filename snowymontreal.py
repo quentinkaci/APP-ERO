@@ -1,11 +1,11 @@
 from src.graph import Graph
-import src.eulerian.make as eulerian
+import src.eulerian.make as make_eulerian
 from src.eulerian.make import make_eulerian_graph
 from src.eulerian.cycle import find_eulerian_cycle
 
 
 def optimized_solve(is_oriented, num_vertices, edge_list):
-    eulerian.optimized = True
+    make_eulerian.optimized = True
     return solve(is_oriented, num_vertices, edge_list)
 
 
