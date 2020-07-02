@@ -1,4 +1,4 @@
-def hierholzer_cycle(graph):
+def hierholzer_cycle(graph, start):
     if graph.num_edges == 0:
         return []
 
@@ -8,8 +8,8 @@ def hierholzer_cycle(graph):
     curr_path = []
     cycle = []
 
-    curr_path.append(0)
-    curr_vertex = 0
+    curr_path.append(start)
+    curr_vertex = start
     while len(curr_path):
         if degrees[curr_vertex] != 0:
             curr_path.append(curr_vertex)
@@ -28,5 +28,5 @@ def hierholzer_cycle(graph):
     return cycle[::-1]
 
 
-def find_eulerian_cycle(graph):
-    return hierholzer_cycle(graph)
+def find_eulerian_cycle(graph, start=0):
+    return hierholzer_cycle(graph, start)

@@ -1,6 +1,6 @@
-from eulerian.cycle import find_eulerian_cycle
-from eulerian.make import make_eulerian_graph
-from graph import Graph
+from src.eulerian.cycle import find_eulerian_cycle
+from src.eulerian.make import make_eulerian_graph
+from src.graph import Graph
 from tests.tools import is_eulerian_cycle
 
 

@@ -1,5 +1,5 @@
 import numpy as np
-from floyd_warshall import floyd_warshall, get_path
+from src.floyd_warshall import floyd_warshall, get_path
 from scipy.optimize import linear_sum_assignment
 import itertools
 import networkx as nx
