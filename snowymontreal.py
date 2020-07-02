@@ -70,7 +70,7 @@ if __name__ == "__main__":
         invert_conversions = {value: key for (key, value) in conversions.items()}
 
         if used == "drone":
-            path = drone_solve(conversions[start], converted_edges_list)  # FIXME
+            path = drone_solve(conversions[start], converted_edges_list)
         else:
             path = snow_plow_solve(conversions[start], len(conversions), converted_edges_list)
 
@@ -102,15 +102,15 @@ if __name__ == "__main__":
 
     point = lat, long
     G = ox.graph_from_point(point, network_type='drive', dist=dist)
+
     if used == "snow plow":
-        edges_to_add = []
-        for src, dst, w in G.edges:
-            edges_to_add.append((dst, src, w))
+        edges_to_add = [(dst, src, w) for src, dst, w in G.edges]
         for src, dst, w in edges_to_add:
             G.add_edge(src, dst, length=w)
-    start = ox.get_nearest_node(G, point, method='euclidean')
-    if used == "drone":
-        G = G.to_undirected()  # FIXME
+    else:
+        G = G.to_undirected()
 
+    start = ox.get_nearest_node(G, point, method='euclidean')
     route = solve_city_graph(G, start, used)
+
     show_city_graph_with_route(G, route)
