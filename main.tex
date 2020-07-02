@@ -1,0 +1,183 @@
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+
+
+
+\title{APP ERO}
+
+\date{Juillet 2020}
+
+
+
+\usepackage[T1]{fontenc}
+
+\begin{document}
+
+\author{Casse Germain, Gosselin Colas, Huynh Kévin, Kaci Quentin}
+
+\maketitle
+
+\vspace{3cm}
+
+\renewcommand{\contentsname}{Table des matières}
+
+\tableofcontents
+
+\newpage
+
+\section{Les solutions utilisées pour le projet}
+
+\subsection{Cas général}
+
+Dans le cas général, trouver le chemin le plus optimal en passant par toutes les arêtes revient à chercher un cycle eulérien dans le graphe.
+
+\newline
+
+Pour le cas d'un graphe déjà eulérien de base, il suffit juste de chercher un cycle: nous avons utilisé l'algorithme de Hierholzer.
+
+\newline
+
+Pour le cas contraire, il faut rendre le graphe eulérien tout en minimisant le coût d'un cycle eulérien parcourant le graphe.
+
+On couple les noeuds en utilisant l'algorithme de Floyd-Warshall afin de calculer le chemin minimal entre tous les noeuds non équilibrés (cela dépend du cas orienté ou non-orienté) du graphe.
+
+
+
+\subsection{Le drone}
+
+Afin de résoudre ce problème pour le drone, nous nous plaçons dans un graphe non orienté. 
+
+\newline
+
+Un graphe non orienté est eulérien si tous ses noeuds sont de dégré pair.
+
+\newline
+
+Notre objectif est donc de transformer tous les noeuds de dégré impair en degré pair en les couplant deux à deux entre eux avec un coût minimal (en dupliquant des arêtes déjà existantes).
+
+\vspace{0.3cm}
+
+\newline
+
+La solution (optimized\_solve) est d'utiliser le "Edmond's algorithm" afin de trouver le couplage minimal dans un graphe quelconque.
+
+Cependant nous ne sommes pas parvenu à implémenter cet algorithme; celui-ci étant complexe.
+
+\vspace{0.3cm}
+
+\newline
+
+Notre première implémentation consistait à calculer tous les couplages possibles des noeuds de dégré impair (brute force) puis de retenir le couplage minimal. Cependant, cette solution était beaucoup trop lente à l'exécution et en consommation mémoire. (de l'ordre du ~ n!)
+
+\vspace{0.3cm}
+
+\newline
+
+Après de nombreuses recherches, nous avons trouvé un moyen d'approximer la solution du problème en utilisant les arbres couvrants minimaux.
+
+Notre solution finale est de calculer l'arbre couvrant minimal à partir du graphe complet de tous les noeuds de degré impair. Puis de trouver le couplage maximal de celui-ci.
+
+Cependant il arrive que des noeuds soient isolés dans le couplage maximal de l'arbre couvrant minimal. Pour cela, il faut alors réitérer le processus avec les noeuds isolés restants jusqu'à ne plus avoir de noeuds de degré impair à traiter.
+
+Cette solution ne donne donc pas le couplage maximal mais une approximation de celui-ci. Le résultat obtenu dans la fonction solve ne correspond par conséquent pas au chemin minimal mais une approximation de celui-ci.
+
+De plus, cette méthode est beaucoup plus optimisée que la méthode brute force présentée précédemment. 
+
+Une fois que nous avons obtenu le couplage minimum, nous devons rajouter les arêtes reliant ces deux noeuds dans le cas du plus court chemin entre eux. 
+
+
+
+\newpage
+
+\subsection{La déneigeuse}
+
+Contrairement au drone, nous nous plaçons dans ce cas dans un graphe orienté.
+
+\newline
+
+Le problème est différent du fait qu'un graphe orienté est eulérien si chaque noeud a le même degré entrant que sortant.
+
+\vspace{0.3cm}
+
+\newline
+
+Notre solution est donc de relier tous les noeuds nécessitant des arêtes entrantes supplémentaires aux noeuds nécessitant des arêtes sortantes supplémentaires. Nous devons donc créer un graphe biparti en mettant d'un c
+
+ôté les noeuds nécessitant des arêtes entrantes et de l'autre ceux nécessitant des arêtes sortantes. À partir de ce graphe, nous devons trouver le couplage minimal. Ce problème est plus simple à résoudre que dans le cas d'un graphe quelconque.
+
+\vspace{0.3cm}
+
+\newline
+
+Dans un premier temps, nous avons utilisé, comme pour le cas du drone, une méthode brute force afin de trouver le couplage minimum. Cependant, nous avons trouvé le "Hungarian algorithm" qui permet de trouver le couplage minimal dans un graphe biparti de manière beaucoup plus optimisée.
+
+Pour cela, nous avons utilisé le "Hungarian algorithm". Une fois que nous avons obtenu le couplage minimum, nous devons rajouter les arêtes reliant ces deux noeuds dans le cas du plus court chemin entre eux.
+
+
+
+\subsection{L'interfaçage avec OSMnx}
+
+Afin de pouvoir utiliser notre moteur sur une grande échelle notamment pour notre cas dans la ville de Montréal, nous avons utilisé les fonctions optimisées de la bibliothèque networkx afin de résoudre notre problème.
+
+\newline
+
+Nous avons plusieurs moteurs pour notre solution que nous avons détaillés dans le README.
+
+\newline
+
+De plus, dans notre produit final, nous permettons à l'utilisateur de rentrer les coordonnées de départ de la déneigeuse ou du drone qu'il veut mettre en marche et nous affichons par la suite le trajet minimal qui parcourt l'ensemble des routes de la zone sélectionnée. 
+
+
+
+\vspace{1cm}
+
+\section{Les potentielles améliorations}
+
+Dans le cadre de la déneigeuse, nous aurions pu utiliser des heuristiques afin d'approximer le résultat et donc gagner en complexité sur l'exécution de l'algorithme
+
+Dans le cadre du drone, nous avons déjà détaillé la méthode permettant de trouver le chemin minimum exact tout en restant sur une complexité O(n\^3).
+
+\newline
+
+Cependant, il existe également des méthodes heuristiques pour améliorer cet algorithme (notamment celle de la bibliothèque networkx).
+
+
+
+\newpage
+
+\section{Conclusion}
+
+Pour conclure, nous avons rapidement identifié ce problème comme étant le Chinese Postman Problem, ce qui nous a aiguillé sur les algorithmes et les méthodes à utiliser. Nous avons dans un premier temps utilisé des méthodes "brute force" pour nos algorithmes afin de savoir si notre algorithme global allait dans la bonne direction. Nous avons par la suite optimisé nos algorithmes afin de monter en charge sur les graphes que nous pouvions prendre en entrée. Pour finir, nos algorithmes n'étant tout de même pas assez efficaces afin de prendre en charge des graphes comme celui de la ville de Montreal, nous avons du utiliser la bibliothèque netwokx qui possède des algorithmes utilisant des heuristiques pour résoudre ce problème efficacement et pouvoir proposer un produit final cohérent.
+
+
+
+\vspace{3cm}
+
+\begin{thebibliography}{2}
+
+\bibitem{}
+
+Optimization on Chinese Postman Problem
+
+\newline
+
+\textit{http://brooksandrew.github.io/simpleblog/articles/intro-to-graph-optimization-solving-cpp/}
+
+
+
+\bibitem{}
+
+Directed Chinese Postman Problem,
+
+\newline
+
+\textit{https://www-m9.ma.tum.de/graph-algorithms/directed-chinese-postman/index\_en.html}
+
+
+
+\end{thebibliography}
+
+
+
+\end{document}
