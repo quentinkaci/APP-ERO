@@ -53,7 +53,7 @@ if __name__ == "__main__":
     # Set log_console to true if the map doesn't download
     ox.config(use_cache=True, log_console=False)
 
-    def solve_city_graph(graph, start):
+    def solve_city_graph(graph, start, used):
         converted_edges_list = []
         conversions = {}
 
@@ -67,7 +67,11 @@ if __name__ == "__main__":
 
         invert_conversions = {value: key for (key, value) in conversions.items()}
 
-        path = drone_solve(conversions[start], converted_edges_list)  # FIXME
+        if used == "drone":
+            path = drone_solve(conversions[start], converted_edges_list)  # FIXME
+        else:
+            path = snow_plow_solve(conversions[start], len(conversions), converted_edges_list)
+
         path = [invert_conversions[v] for v in path]
 
         return path
@@ -91,8 +95,15 @@ if __name__ == "__main__":
 
     point = lat, long
     G = ox.graph_from_point(point, network_type='drive', dist=dist)
+    if used == "snow plow":
+        edges_to_add = []
+        for src, dst, w in G.edges:
+            edges_to_add.append((dst, src, w))
+        for src, dst, w in edges_to_add:
+            G.add_edge(src, dst, length=w)
     start = ox.get_nearest_node(G, point, method='euclidean')
-    G = G.to_undirected()  # FIXME
+    if used == "drone":
+        G = G.to_undirected()  # FIXME
 
-    route = solve_city_graph(G, start)
+    route = solve_city_graph(G, start, used)
     show_city_graph_with_route(G, route)
