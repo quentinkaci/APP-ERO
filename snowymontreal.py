@@ -78,8 +78,8 @@ if __name__ == "__main__":
     def show_city_graph_with_route(graph, route):
         for i in range(1, len(route) + 1):
             figure, ax = ox.plot_graph_route(graph, route[:i], route_linewidth=6, node_size=0, bgcolor='k')
-            if figure and i < len(route):
-                time.sleep(0.1)
+            if i < len(route):
+                plt.pause(0.2)
                 plt.close(figure)
 
 
