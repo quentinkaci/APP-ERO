@@ -3,7 +3,9 @@ from src.eulerian import make as make_eulerian
 from src.eulerian.make import make_eulerian_graph
 from src.eulerian.cycle import find_eulerian_cycle
 import osmnx as ox
+from matplotlib import pyplot as plt
 import networkx as nx
+import time
 
 
 def optimized_solve(is_oriented, num_vertices, edge_list):
@@ -79,7 +81,12 @@ if __name__ == "__main__":
     # Crashes if the route isn't legal
     def show_city_graph_with_route(graph, route):
         for i in range(1, len(route) + 1):
-            ox.plot_graph_route(graph, route[:i], route_linewidth=6, node_size=0, bgcolor='k')  # FIXME
+            ox.plot_graph_route(graph, route[:i], route_linewidth=6, node_size=0, bgcolor='k')
+            plt.pause(0.1)
+            plt.close()
+
+
+    plt.ion()
 
     used = ""
     while used not in ("drone", "snow plow"):
