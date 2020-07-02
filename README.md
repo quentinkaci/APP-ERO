@@ -2,11 +2,22 @@
 
 ## Installation
 
+```js
+./setup.sh
+```
+
+De plus, il faut installer le paquet spatialindex afin qu'OSMnx puisse fonctionner.
+
+## Exemple d'utilisation
 
 
-## Utilisation
-
-
+```js
+$ python3 snowymontreal.py
+> Type "drone" or "snow plow" depending on what you want to use: drone
+> Latitude of drone: 45.501690
+> Longitude of drone: -73.567253
+> Radius for drone to cover: 300
+```
 
 ## Moteur de notre solution
 
