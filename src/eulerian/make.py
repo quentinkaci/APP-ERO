@@ -1,5 +1,8 @@
-import numpy as np
 from src.floyd_warshall import floyd_warshall, get_path
+from src.graph import Graph
+from src.kruskal import kruskal_min_spanning_tree
+from src.matching import find_maximum_matching
+import numpy as np
 import scipy.optimize
 import itertools
 import networkx as nx
@@ -46,18 +49,24 @@ def find_minimum_path_directed(graph, unbalanced_vertices, paths_costs, parents)
     return find_path(min_matching, parents)
 
 
-def all_matching(unbalanced_vertices):
-    for vertex in unbalanced_vertices[1:]:
-        pair = unbalanced_vertices[0], vertex
-        rest = [n for n in unbalanced_vertices if n not in pair]
-        if rest:
-            for tail in all_matching(rest):
-                yield [pair] + tail
-        else:
-            yield [pair]
+def connected_graph_undirected(edges):
+    conversion = {}
+    for src, dst, dist in edges:
+        if src not in conversion.keys():
+            conversion[src] = len(conversion)
+        if dst not in conversion.keys():
+            conversion[dst] = len(conversion)
+
+    graph = Graph(len(conversion))
+    for src, dst, dist in edges:
+        graph.add_edge([conversion[src], conversion[dst], dist])
+
+    return graph, {value: key for (key, value) in conversion.items()}
 
 
 def find_minimum_path_undirected(unbalanced_vertices, paths_costs, parents):
+    min_matching = []
+
     if optimized:
         nx_graph = nx.Graph()
         combinations = itertools.combinations(unbalanced_vertices, 2)
@@ -66,18 +75,19 @@ def find_minimum_path_undirected(unbalanced_vertices, paths_costs, parents):
 
         min_matching = list(nx.max_weight_matching(nx_graph, True))
     else:
-        all_possible_matching = [x for x in all_matching(unbalanced_vertices)]
+        while len(unbalanced_vertices) > 0:
+            combinations = itertools.combinations(unbalanced_vertices, 2)
+            graph, conversion = connected_graph_undirected([(src, dst, paths_costs[src][dst])
+                                                            for src, dst in combinations])
 
-        min_weight = inf
-        min_matching = []
+            min_spanning_tree = [(src, dst) for src, dst, _ in kruskal_min_spanning_tree(graph)]
+            matching = find_maximum_matching(graph.num_vertices, min_spanning_tree)
+            converted_matching = [(conversion[src], conversion[dst]) for src, dst in matching]
+            min_matching.extend(converted_matching)
 
-        for matching in all_possible_matching:
-            pair_weight = 0
-            for src, dst in matching:
-                pair_weight += paths_costs[src][dst]
-            if pair_weight < min_weight:
-                min_weight = pair_weight
-                min_matching = matching
+            for src, dst in converted_matching:
+                unbalanced_vertices.remove(src)
+                unbalanced_vertices.remove(dst)
 
     return find_path(min_matching, parents)
 
