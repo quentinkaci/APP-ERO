@@ -34,8 +34,10 @@ def solve_city_graph(graph):
 
 
 # Crashes if the route isn't legal
-def show_city_graph_with_route(graph, route):
-    ox.plot_graph_route(graph, route, route_linewidth=6, node_size=0, bgcolor='k')
+def show_city_graph_with_route(graph, route, n):
+    for i in range(1, n):
+        ox.plot_graph_route(graph, route[:int(len(route)*(i+1)/n)], route_linewidth=6, node_size=0, bgcolor='k')
+
 
 
 # Example:
@@ -47,4 +49,4 @@ G = G.to_undirected()
 
 route = solve_city_graph(G)
 print("best path:", route)
-show_city_graph_with_route(G, route)
+show_city_graph_with_route(G, route, 20)
