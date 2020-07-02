@@ -10,8 +10,6 @@ def download_city_graph(place: str):
 
 
 def solve_city_graph(graph):
-    print("edges:", list(graph.edges))
-
     converted_edges_list = []
     conversions = {}
 
@@ -25,8 +23,6 @@ def solve_city_graph(graph):
 
     invert_conversions = {value: key for (key, value) in conversions.items()}
 
-    print("converted:", converted_edges_list)
-    print("number of nodes:", len(conversions))
     path = optimized_solve(False, len(conversions), converted_edges_list)
     path = [invert_conversions[v] for v in path]
 
@@ -34,19 +30,23 @@ def solve_city_graph(graph):
 
 
 # Crashes if the route isn't legal
-def show_city_graph_with_route(graph, route, n):
-    for i in range(1, n):
-        ox.plot_graph_route(graph, route[:int(len(route)*(i+1)/n)], route_linewidth=6, node_size=0, bgcolor='k')
+def show_city_graph_with_route(graph, route):
+    for i in range(1, len(route) + 1):
+        ox.plot_graph_route(graph, route[:i], route_linewidth=6, node_size=0, bgcolor='k')
 
-
-
-# Example:
 
 # G = download_city_graph('Piedmont, California, USA')
-point = 37.858495, -122.267468
-G = ox.graph_from_point(point, network_type='drive', dist=200)
+lat, long = float(input("Latitude of center: ")), float(input("Longitude of center: "))
+if lat < -90 or lat > 90 or long < -180 or long > 180:
+    raise ValueError
+
+dist = int(input("Distance from center to boarders: "))
+if dist <= 0:
+    raise ValueError
+
+point = lat, long
+G = ox.graph_from_point(point, network_type='drive', dist=dist)
 G = G.to_undirected()
 
 route = solve_city_graph(G)
-print("best path:", route)
-show_city_graph_with_route(G, route, 20)
+show_city_graph_with_route(G, route)
