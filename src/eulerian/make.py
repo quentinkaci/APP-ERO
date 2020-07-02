@@ -1,6 +1,6 @@
 import numpy as np
 from src.floyd_warshall import floyd_warshall, get_path
-from scipy.optimize import linear_sum_assignment
+import scipy.optimize
 import itertools
 import networkx as nx
 
@@ -40,7 +40,7 @@ def find_minimum_path_directed(graph, unbalanced_vertices, paths_costs, parents)
         for dst in range(len(positives)):
             bipartite_matrix[src][dst] = paths_costs[negatives[src]][positives[dst]]
 
-    row_ind, col_ind = linear_sum_assignment(bipartite_matrix)
+    row_ind, col_ind = scipy.optimize.linear_sum_assignment(bipartite_matrix)
     min_matching = [(negatives[row_ind[i]], positives[col_ind[i]]) for i in range(len(negatives))]
 
     return find_path(min_matching, parents)
