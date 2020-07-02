@@ -1,7 +1,5 @@
-from src.floyd_warshall import floyd_warshall, get_path
+from src.algorithms import floyd_warshall, get_path, kruskal_min_spanning_tree, find_maximum_matching
 from src.graph import Graph
-from src.kruskal import kruskal_min_spanning_tree
-from src.matching import find_maximum_matching
 import numpy as np
 import scipy.optimize
 import itertools
