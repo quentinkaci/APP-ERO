@@ -2,17 +2,28 @@
 
 ## Installation
 
+### Linux
+
 ```js
 ./setup.sh
 ```
 
 De plus, il faut installer le paquet spatialindex afin qu'OSMnx puisse fonctionner.
 
+### Windows
+
+```js
+pip install -r requirements.txt
+```
+
+Cette commande permet d'installer les paquets nécessaires à l'execution du projet à savoir: numpy, scipy ainsi qu'osmnx
+
+
 ## Exemple d'utilisation
 
 
 ```js
-$ python3 snowymontreal.py
+$ python snowymontreal.py
 > Type "drone" or "snow plow" depending on what you want to use: drone
 > Latitude of drone: 45.501690
 > Longitude of drone: -73.567253
