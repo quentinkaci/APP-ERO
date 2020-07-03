@@ -2,6 +2,8 @@
 
 ## Installation
 
+Ce projet necessite le programme python ainsi que le gestionnaire de paquets pip
+
 ### Linux
 
 ```js
@@ -16,7 +18,7 @@ De plus, il faut installer le paquet spatialindex afin qu'OSMnx puisse fonctionn
 pip install -r requirements.txt
 ```
 
-Cette commande permet d'installer les paquets nécessaires à l'execution du projet à savoir: numpy, scipy ainsi qu'osmnx
+Cette commande permet d'installer les paquets nécessaires à l'execution du projet à savoir: numpy, scipy et osmnx
 
 
 ## Exemple d'utilisation
