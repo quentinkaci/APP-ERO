@@ -2,9 +2,11 @@
 
 ## Installation
 
-Ce projet necessite le programme python ainsi que le gestionnaire de paquets pip
+Ce projet necessite le programme python3 ainsi que le gestionnaire de paquets pip3.
 
 ### Linux
+
+Afin de lancer la commande suivante le paquet python3-venv est requis.
 
 ```js
 ./setup.sh
