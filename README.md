@@ -27,7 +27,7 @@ Cette commande permet d'installer les paquets nécessaires à l'execution du pro
   
   
 ```js  
-$ python snowymontreal.py  
+$ python3 snowymontreal.py  
 > Type "drone" or "snow plow" depending on what you want to use: drone  
 > Latitude of drone: 45.501690  
 > Longitude of drone: -73.567253  
