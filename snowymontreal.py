@@ -5,7 +5,7 @@ from src.eulerian.cycle import find_eulerian_cycle
 import osmnx as ox
 from matplotlib import pyplot as plt
 import networkx as nx
-import time
+import sys
 
 
 def optimized_solve(is_oriented, num_vertices, edge_list):
@@ -84,7 +84,8 @@ if __name__ == "__main__":
             plt.close()
 
 
-    plt.ion()
+    if "--no-interactive" not in sys.argv:
+        plt.ion()
 
     used = ""
     while used not in ("drone", "snow plow"):
