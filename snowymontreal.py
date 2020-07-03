@@ -80,8 +80,9 @@ if __name__ == "__main__":
     def show_city_graph_with_route(graph, route):
         for i in range(1, len(route) + 1):
             ox.plot_graph_route(graph, route[:i], route_linewidth=6, node_size=0, bgcolor='k')
-            plt.pause(0.5)
-            plt.close()
+            if "--no-interactive" not in sys.argv:
+                plt.pause(0.5)
+                plt.close()
 
 
     if "--no-interactive" not in sys.argv:
