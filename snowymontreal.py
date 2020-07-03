@@ -102,16 +102,18 @@ if __name__ == "__main__":
 
     point = lat, long
     G = ox.graph_from_point(point, network_type='drive', dist=dist)
-    edges = G.edges
-    for src, dst, _ in edges:
-        if (dst, src) in edges:
+
+    edges = [(src, dst) for src, dst, _ in G.edges]
+    i = 0
+    for src, dst in edges:
+        i += 1
+        if (dst, src) in edges[i:]:
             try:
                 G.remove_edge(dst, src)
             except:
                 continue
 
     if used == "snow plow":
-
         edges_to_add = [(dst, src, w) for src, dst, w in G.edges]
         for src, dst, w in edges_to_add:
             G.add_edge(src, dst, length=w)
