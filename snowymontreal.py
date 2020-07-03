@@ -82,7 +82,7 @@ if __name__ == "__main__":
     def show_city_graph_with_route(graph, route):
         for i in range(1, len(route) + 1):
             ox.plot_graph_route(graph, route[:i], route_linewidth=6, node_size=0, bgcolor='k')
-            plt.pause(0.1)
+            plt.pause(0.5)
             plt.close()
 
 
@@ -102,8 +102,16 @@ if __name__ == "__main__":
 
     point = lat, long
     G = ox.graph_from_point(point, network_type='drive', dist=dist)
+    edges = G.edges
+    for src, dst, _ in edges:
+        if (dst, src) in edges:
+            try:
+                G.remove_edge(dst, src)
+            except:
+                continue
 
     if used == "snow plow":
+
         edges_to_add = [(dst, src, w) for src, dst, w in G.edges]
         for src, dst, w in edges_to_add:
             G.add_edge(src, dst, length=w)
