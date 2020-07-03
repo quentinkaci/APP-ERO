@@ -122,8 +122,9 @@ def kruskal_min_spanning_tree(graph):
     while num_edges < graph.num_vertices - 1:
         src, dst, dist = sorted_edges[i]
         src_parent, dst_parent = find(parent, src), find(parent, dst)
+        is_cycle = src_parent != dst_parent
 
-        if src_parent != dst_parent:  # There is a cycle
+        if is_cycle:
             num_edges += 1
             res.append((src, dst, dist))
             union(parent, position, src_parent, dst_parent)
