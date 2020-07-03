@@ -52,7 +52,6 @@ def drone_solve(start, edge_list):
 
 
 if __name__ == "__main__":
-    # Set log_console to true if the map doesn't download
     ox.config(use_cache=True, log_console=False)
 
     def solve_city_graph(graph, start, used):
@@ -78,7 +77,6 @@ if __name__ == "__main__":
 
         return path
 
-    # Crashes if the route isn't legal
     def show_city_graph_with_route(graph, route):
         for i in range(1, len(route) + 1):
             ox.plot_graph_route(graph, route[:i], route_linewidth=6, node_size=0, bgcolor='k')
@@ -103,8 +101,7 @@ if __name__ == "__main__":
     point = lat, long
     G = ox.graph_from_point(point, network_type='drive', dist=dist)
 
-    edges = [(src, dst) for src, dst, _ in G.edges]
-    i = 0
+    edges, i = [(src, dst) for src, dst, _ in G.edges], 0
     for src, dst in edges:
         i += 1
         if (dst, src) in edges[i:]:

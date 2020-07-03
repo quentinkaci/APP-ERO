@@ -1,7 +1,7 @@
 #!/bin/bash
 
-python -m venv env
+python3 -m venv env
 chmod +x env/bin/activate
 source env/bin/activate
 
-pip install -r requirements.txt
+pip3 install -r requirements.txt
