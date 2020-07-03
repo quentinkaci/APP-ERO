@@ -17,7 +17,7 @@ De plus, il faut installer le paquet spatialindex afin qu'OSMnx puisse fonctionn
 ### Windows  
   
 ```js  
-pip install -r requirements.txt  
+pip3 install -r requirements.txt  
 ```  
   
 Cette commande permet d'installer les paquets nécessaires à l'execution du projet à savoir: numpy, scipy et osmnx  
